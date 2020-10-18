@@ -3,8 +3,6 @@
 import pytest
 import yaml
 
-from pythoncode.calculator import Calculator
-
 # 解析测试数据文件
 def get_datas():
     with open("./datas/calc.yml", encoding='utf-8') as f:
@@ -32,43 +30,45 @@ def steps(addstepsfile, calc, a, b, expect):
 
 
 class TestCalc:
-    def setup_class(self):
-        print("计算开始")
-        self.calc = Calculator()
-
-    def teardown_class(self):
-        print("计算结束")
+    # def setup_class(self):
+    #     print("计算开始")
+    #     self.calc = Calculator()
+    #
+    # def teardown_class(self):
+    #     print("计算结束")
 
     @pytest.mark.parametrize('a,b,expect', get_datas()[0], ids=get_datas()[1])
-    def test_add(self, a, b, expect):
+    def test_add(self, get_calc, a, b, expect):
         # calc = Calculator()
-        result = self.calc.add(a, b)
+        # result = self.calc.add(a, b)
+        result = get_calc.add(a, b)
         assert result == expect
 
     @pytest.mark.parametrize('a,b,expect', [
         [0.1, 0.1, 0.2], [0.1, 0.2, 0.3]
     ])
-    def test_add_float(self, a, b, expect):
-        result = self.calc.add(a, b)
+    def test_add_float(self, get_calc, a, b, expect):
+        # result = self.calc.add(a, b)
+        result = get_calc.add(a, b)
         assert round(result, 2) == expect
 
     @pytest.mark.parametrize('a,b', [
         [0.1, 0], [10, 0]
     ])
-    def test_div_zero(self, a, b):
+    def test_div_zero(self, get_calc, a, b):
         with pytest.raises(ZeroDivisionError):
-            self.calc.div(a, b)
-
+            # self.calc.div(a, b)
+            get_calc.div(a, b)
         # try:
         #     result = self.calc.div(1,0)
         # except ZeroDivisionError :
         #     print("除数为0")
 
-    def test_add_steps(self):
+    def test_add_steps(self, get_calc):
         a = 1
         b = 1
         expect = 2
-        steps("./steps/add_steps.yml", self.calc, a, b, expect)
+        steps("./steps/add_steps.yml", get_calc, a, b, expect)
         # assert 2 == self.calc.add(1,1)
         # assert 3 == self.calc.add1(1,2)
         # assert 0 == self.calc.add(-1,1)
