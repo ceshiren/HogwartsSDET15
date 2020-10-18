@@ -5,7 +5,7 @@ import yaml
 
 from pythoncode.calculator import Calculator
 
-
+# 解析测试数据文件
 def get_datas():
     with open("./datas/calc.yml", encoding='utf-8') as f:
         datas = yaml.safe_load(f)
@@ -14,6 +14,21 @@ def get_datas():
     print(add_ids)
     print(add_datas)
     return [add_datas, add_ids]
+
+
+# 解析测试步骤文件
+def steps(addstepsfile, calc, a, b, expect):
+    with open(addstepsfile) as f:
+        steps = yaml.safe_load(f)
+
+    for step in steps:
+        if 'add' == step:
+            print("step: add")
+            result = calc.add(a, b)
+        elif 'add1' == step:
+            print("step: add1")
+            result = calc.add1(a, b)
+        assert expect == result
 
 
 class TestCalc:
@@ -48,6 +63,15 @@ class TestCalc:
         #     result = self.calc.div(1,0)
         # except ZeroDivisionError :
         #     print("除数为0")
+
+    def test_add_steps(self):
+        a = 1
+        b = 1
+        expect = 2
+        steps("./steps/add_steps.yml", self.calc, a, b, expect)
+        # assert 2 == self.calc.add(1,1)
+        # assert 3 == self.calc.add1(1,2)
+        # assert 0 == self.calc.add(-1,1)
 
 # def test_add1(self):
 #     test_data = [
