@@ -1,12 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import pytest
+import yaml
 
 from pythoncode.calculator import Calculator
 
 
-def test_a():
-    print("test case a")
+def get_datas():
+    with open("./datas/calc.yml", encoding='utf-8') as f:
+        datas = yaml.safe_load(f)
+    add_datas = datas['add']['datas']
+    add_ids = datas['add']['ids']
+    print(add_ids)
+    print(add_datas)
+    return [add_datas, add_ids]
 
 
 class TestCalc:
@@ -17,10 +24,7 @@ class TestCalc:
     def teardown_class(self):
         print("计算结束")
 
-    @pytest.mark.parametrize('a,b,expect', [
-        [1, 1, 2], [100, 1, 200], [0.1, 0.1, 0.2], [-1, -1, -2],
-        [1, 0, 1], [0.1, 0.2, 0.3]
-    ], ids=['int_case', 'bignum_case', 'float_case', 'minus_case', 'zero_case', 'smallnum_case'])
+    @pytest.mark.parametrize('a,b,expect', get_datas()[0], ids=get_datas()[1])
     def test_add(self, a, b, expect):
         # calc = Calculator()
         result = self.calc.add(a, b)
@@ -33,10 +37,10 @@ class TestCalc:
         result = self.calc.add(a, b)
         assert round(result, 2) == expect
 
-    @pytest.mark.parametrize('a,b,expect', [
+    @pytest.mark.parametrize('a,b', [
         [0.1, 0], [10, 0]
     ])
-    def test_div(self, a, b):
+    def test_div_zero(self, a, b):
         with pytest.raises(ZeroDivisionError):
             self.calc.div(a, b)
 

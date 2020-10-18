@@ -1,0 +1,23 @@
+add:
+  datas:
+    - [1, 1, 2]
+    - [100, 1, 200]
+    - [0.1, 0.1, 0.2]
+    - [-1, -1, -2]
+    - [1, 0, 1]
+    - - 0.1
+      - 0.2
+      - 0.3
+  ids:
+    - 'int_case'
+    - 'bignum_case'
+    - 'float_case'
+    - 'minus_case'
+    - 'zero_case'
+    - 'smallnum_case'
+div:
+  datas:
+    - [0.1, 0]
+    - [10, 0]
+
+
