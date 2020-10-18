@@ -9,9 +9,9 @@ add:
       - 0.2
       - 0.3
   ids:
-    - 'int_case'
-    - 'bignum_case'
-    - 'float_case'
+    - '整数用例'
+    - '大数用例'
+    - '浮点数用例'
     - 'minus_case'
     - 'zero_case'
     - 'smallnum_case'
