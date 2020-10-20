@@ -3,6 +3,7 @@
 from typing import List
 
 import pytest
+import yaml
 
 from pythoncode.calculator import Calculator
 
@@ -47,3 +48,29 @@ def pytest_collection_modifyitems(
             item.add_marker(pytest.mark.add)
         elif 'div' in item._nodeid:
             item.add_marker(pytest.mark.div)
+
+
+def pytest_addoption(parser):
+    mygroup = parser.getgroup("hogwarts-FIS")  # group 将下面所有的 option都展示在这个group下。
+    mygroup.addoption("--env",  # 注册一个命令行选项
+                      default='test',  # 默认值
+                      dest='env',  # 存储的变量
+                      help='set your run env'  # 参数说明
+                      )
+
+
+@pytest.fixture(scope='session')
+def cmdoption(request):
+    myenv = request.config.getoption("--env", default='test')
+
+    if myenv == 'test':
+        datapath = "datas/test/data.yml"
+    elif myenv == 'dev':
+        datapath = "datas/dev/data.yml"
+
+    with open(datapath) as f:
+        datas = yaml.safe_load(f)
+
+    print(datas)
+
+    return myenv, datas
