@@ -12,7 +12,7 @@ class TestTestdemo():
     def setup_method(self, method):
         options = Options()
         options.debugger_address = "127.0.0.1:9222"
-        self.driver = webdriver.Chrome()
+        self.driver = webdriver.Chrome(options=options)
 
     def teardown_method(self, method):
         self.driver.quit()
@@ -44,7 +44,8 @@ class TestTestdemo():
              'value': '4265340051991539'},
             {'domain': 'work.weixin.qq.com', 'expiry': 1603401527, 'httpOnly': True, 'name': 'ww_rtkey', 'path': '/',
              'secure': False, 'value': '1c9etn1'},
-            {'domain': '.qq.com', 'expiry': 1603457502, 'httpOnly': False, 'name': '_gid', 'path': '/', 'secure': False,
+            {'domain': '.qq.com', 'expiry': 1603457502.12321, 'httpOnly': False, 'name': '_gid', 'path': '/',
+             'secure': False,
              'value': 'GA1.2.15599625.1603101807'},
             {'domain': '.qq.com', 'expiry': 2147483646, 'httpOnly': False, 'name': 'RK', 'path': '/', 'secure': False,
              'value': 'ycykxRqS4P'},
@@ -80,6 +81,8 @@ class TestTestdemo():
 
         self.driver.get("https://work.weixin.qq.com/wework_admin/frame#index")
         for cookie in cookies:
+            if 'expiry' in cookie.keys():
+                cookie.pop('expiry')
             self.driver.add_cookie(cookie)
 
         self.driver.refresh()
