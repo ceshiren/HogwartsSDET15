@@ -8,9 +8,9 @@ class TestWX:
         self.main = MainPage()
 
     def test_addmember(self):
-        username = "aaaaaac"
-        account = "aaaaaac_hogwarts"
-        phonenum = "13400000002"
+        username = "aaaaaad"
+        account = "aaaaaad_hogwarts"
+        phonenum = "13400000003"
 
         addmember = self.main.goto_addmember()
         addmember.add_member(username, account, phonenum)
