@@ -10,7 +10,7 @@ class RegisterPage:
         self.driver = driver
 
     # 注册信息
-    def register_success(self):
+    def register(self):
         self.driver.find_element(By.ID, "corp_name").send_keys("aaaaa")
         self.driver.find_element(By.ID, "manager_name").send_keys("bbbbbb")
         self.driver.find_element(By.ID, "register_tel").send_keys("13900000000")
