@@ -9,6 +9,9 @@ class TestContact:
         self.app = App()
         self.main = self.app.start().goto_main()
 
+    def teardown(self):
+        self.app.stop()
+
     def test_addcontact(self):
         name = "hogwarts__004"
         gender = "男"
