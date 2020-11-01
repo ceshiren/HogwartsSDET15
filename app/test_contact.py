@@ -31,19 +31,25 @@ class TestWX:
         self.driver.quit()
 
     def test_contact(self):
+        '''
+        添加联系人
+        :return:
+        '''
         name = "hogwarts__002"
         gender = "男"
         phonenum = "13500000001"
+        # 进入到通讯录界面
         self.driver.find_element(MobileBy.XPATH, "//*[@text='通讯录']").click()
         # self.driver.find_element(MobileBy.XPATH, "//*[@text='添加成员']").click()
-
+        # 滚动查找【添加成员】
         self.driver.find_element(MobileBy.ANDROID_UIAUTOMATOR,
                                  'new UiScrollable(new UiSelector()\
                                  .scrollable(true).instance(0))\
                                  .scrollIntoView(new UiSelector()\
                                  .text("添加成员").instance(0));').click()
-
+        # 点击【手动输入添加】
         self.driver.find_element(MobileBy.XPATH, "//*[@text='手动输入添加']").click()
+        # 设置 【用户名】【性别】【手机号】
         self.driver.find_element(MobileBy.XPATH,
                                  "//*[contains(@text, '姓名')]/../*[@text='必填']").send_keys(name)
         self.driver.find_element(MobileBy.XPATH, "//*[contains(@text, '性别')]/..//*[@text='男']").click()
@@ -57,8 +63,10 @@ class TestWX:
         self.driver.find_element(MobileBy.XPATH,
                                  '//*[contains(@text, "手机") and contains(@class, "TextView")]/..//android.widget.EditText').send_keys(
             phonenum)
+        # 点击【保存】
         self.driver.find_element(MobileBy.XPATH, "//*[@text='保存']").click()
         # sleep(2)
         # print(self.driver.page_source)
+        # 验证 添加成功 toast
         result = self.driver.find_element(MobileBy.XPATH, "//*[@class='android.widget.Toast']").text
         assert '添加成功' == result
