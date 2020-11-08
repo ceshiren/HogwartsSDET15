@@ -9,4 +9,4 @@ class Main(BasePage):
         # 制造假的弹窗
         self.find(By.XPATH, "//*[@resource-id='com.xueqiu.android:id/post_status']").click()
         self.find(By.XPATH, "//*[@resource-id='android:id/tabs']//*[@text='行情']").click()
-        return Market()
+        return Market(self.driver)
