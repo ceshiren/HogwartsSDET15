@@ -1,3 +1,5 @@
+import allure
+
 
 def handle_black(func):
     def wrapper(*args, **kwargs):
@@ -9,6 +11,10 @@ def handle_black(func):
             return result
         # 捕获黑名单中的元素
         except Exception as e:
+            instance.driver.save_screenshot("tmp.png")
+            with open("tmp.png", "rb") as f:
+                content = f.read()
+            allure.attach(content, attachment_type=allure.attachment_type.PNG)
             # 超过最大查找次数
             if instance.error_num > instance.max_num:
                 raise e
@@ -21,5 +27,5 @@ def handle_black(func):
                     # 处理完黑名单后，再次查找原来的元素
                     return wrapper(*args, **kwargs)
             raise e
-        
+
     return wrapper
