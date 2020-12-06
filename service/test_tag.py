@@ -1,15 +1,11 @@
 import datetime
-import json
 
 import pytest
-import requests
-
 # done: 与底层具体的实现框架代码耦合严重，无法适应变化，比如公司切换了协议，比如使用pb dubbo
 # done: 代码冗余，需要封装
 # done: 无法清晰的描述业务
 # done: 使用jsonpath表达更灵活的递归查找
 from jsonpath import jsonpath
-
 from service.tag import Tag
 
 
