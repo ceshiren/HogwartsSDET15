@@ -7,16 +7,15 @@ import requests
 class Tag:
 
     def __init__(self):
-        self.token=self.get_token()
+        self.token = self.get_token()
 
     def get_token(self):
-        corpid = 'wwd6da61649bd66fea'
-        corpsecret = 'heLiPlmyblHRiKAgGWZky7MMvyld3d3QMUl5ra7NBZU'
+        corpid = 'wwe653983e4c732493'
+        corpsecret = 'QMfBKdeuClrNad7CjWpdRdm8jJEVZdSDbIKpvQUzgeg'
 
         r = requests.get(
             'https://qyapi.weixin.qq.com/cgi-bin/gettoken',
             params={'corpid': corpid, 'corpsecret': corpsecret}
-
         )
         print(json.dumps(r.json(), indent=2))
         assert r.status_code == 200
@@ -25,8 +24,44 @@ class Tag:
         token = r.json()['access_token']
         return token
 
-    def add(self):
-        pass
+    def find_group_id_by_name(self, group_name):
+        # 查询元素是否存在，如果不存在，报错
+        for group in self.list().json()["tag_group"]:
+            if group_name in group["group_name"]:
+                return group["group_id"]
+        print("group name not in goup")
+        return ""
+
+    def add(self, group_name, tag, **kwargs):
+        r = requests.post(
+            "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/add_corp_tag",
+            params={"access_token": self.token},
+            json={"group_name": group_name,
+                  "tag": tag,
+                  **kwargs
+                  }
+        )
+
+        print(json.dumps(r.json(), indent=2))
+        return r
+
+    # step 1  => step1 false
+    # step 2  => step2 true
+    # step 3  => step3 true
+    def add_and_detect(self, group_name, tag, **kwargs):
+        r = self.add(group_name, tag, **kwargs)
+        # 如果删除的元素已经存在地
+        if r.json()["errcode"] == 40071:
+            group_id = self.find_group_id_by_name(group_name)
+            if not group_id:
+                # 元素不在，接口有问题
+                return False
+            self.delete_group(group_id)
+            self.add(group_name, tag, **kwargs)
+        result = self.find_group_id_by_name(group_name)
+        if not result:
+            print("add not success")
+        return result
 
     def list(self):
         r = requests.post(
@@ -52,5 +87,36 @@ class Tag:
         print(json.dumps(r.json(), indent=2))
         return r
 
-    def delete(self):
-        pass
+    # 查询 tag_id ->  删除 tag_id
+    # 如果正常： 成功
+    # {
+    #     "errcode": 0,
+    #     "errmsg": "ok"
+    # }
+    # 如果异常： 失败（）
+    # 　手动获取
+
+    def delete_group(self, group_id):
+        r = requests.post(
+            "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/del_corp_tag",
+            params={"access_token": self.token},
+            json={
+                "group_id": group_id
+                # "tag_id": ["et_6ElDwAA6RQb_EVpMei30pmbsy-Zpw"],
+            }
+
+        )
+        print(json.dumps(r.json(), indent=2))
+        return r
+
+    def delete_tag(self, tag_id):
+        r = requests.post(
+            "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/del_corp_tag",
+            params={"access_token": self.token},
+            json={
+                "tag_id": tag_id,
+            }
+
+        )
+        print(json.dumps(r.json(), indent=2))
+        return r

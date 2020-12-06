@@ -9,8 +9,8 @@ import requests
 # todo: 无法清晰的描述业务
 # todo: 使用jsonpath表达更灵活的递归查找
 def test_tag_list():
-    corpid = 'wwd6da61649bd66fea'
-    corpsecret = 'heLiPlmyblHRiKAgGWZky7MMvyld3d3QMUl5ra7NBZU'
+    corpid = 'wwe653983e4c732493'
+    corpsecret = 'QMfBKdeuClrNad7CjWpdRdm8jJEVZdSDbIKpvQUzgeg'
 
     r = requests.get(
         'https://qyapi.weixin.qq.com/cgi-bin/gettoken',
@@ -40,7 +40,7 @@ def test_tag_list():
         'https://qyapi.weixin.qq.com/cgi-bin/externalcontact/edit_corp_tag',
         params={"access_token": token},
         json={
-            'id': 'etQKd-CgAAqu3dqyzDrfEyrHb0lMmaJQ',
+            'id': 'et_6ElDwAAK8oJuAJ82drAyVi7DBhJyA',
             'name': tag_name
         }
     )
