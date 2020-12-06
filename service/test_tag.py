@@ -50,7 +50,7 @@ class TestTag:
         # todo: 测试数据要放到数据文件中
         group_name = "TMP00123"
         tag = [
-            {"name": "TAG1"},
+            {"name": "TAG3"},
             {"name": "TAG2"},
             {"name": "TAG3"},
         ]
@@ -81,3 +81,7 @@ class TestTag:
 
     def test_delete_tag(self):
         self.tag.delete_tag(["et_6ElDwAAgItYmM3RQYkH3dhdAI8_QA"])
+
+    def test_delete_and_detect_group(self):
+        r = self.tag.delete_and_detect_group(["et_6ElDwAAyvuY_HFzh0vHvy-yqYhVHA"])
+        assert r.json()["errcode"] == 0

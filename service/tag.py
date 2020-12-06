@@ -32,6 +32,14 @@ class Tag:
         print("group name not in goup")
         return ""
 
+    def is_group_id_exist(self, group_id):
+        # 查询元素是否存在，如果不存在，报错
+        for group in self.list().json()["tag_group"]:
+            if group_id in group["group_id"]:
+                return True
+        print("group id not in goup")
+        return False
+
     def add(self, group_name, tag, **kwargs):
         r = requests.post(
             "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/add_corp_tag",
@@ -55,7 +63,7 @@ class Tag:
             group_id = self.find_group_id_by_name(group_name)
             if not group_id:
                 # 元素不在，接口有问题
-                return False
+                return ""
             self.delete_group(group_id)
             self.add(group_name, tag, **kwargs)
         result = self.find_group_id_by_name(group_name)
@@ -72,7 +80,7 @@ class Tag:
             }
         )
 
-        print(json.dumps(r.json(), indent=2))
+        # print(json.dumps(r.json(), indent=2))
         return r
 
     def update(self, id, tag_name):
@@ -119,4 +127,20 @@ class Tag:
 
         )
         print(json.dumps(r.json(), indent=2))
+        return r
+
+    def delete_and_detect_group(self, group_ids):
+        deleted_group_ids = []
+        r = self.delete_group(group_ids)
+        if r.json()["errcode"] == 40068:
+            # 如果标签不存在，就添加一个标签，将它的 group_id 存储进来
+            for group_id in group_ids:
+                if not self.is_group_id_exist(group_id):
+                    group_id_tmp = self.add_and_detect(group_name="TMP00123",
+                                                       tag=[{"name": "TAG1"}])
+                    deleted_group_ids.append(group_id_tmp)
+                # 如果标签存在，就将它存入标签组
+                else:
+                    deleted_group_ids.append(group_id)
+            r = self.delete_group(deleted_group_ids)
         return r
