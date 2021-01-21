@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
 
@@ -7,6 +7,7 @@ api = Api(app)
 
 app.config['db'] = []
 
+# java mybatis hibernate python sqlalchemy
 username = 'python15'
 password = 'ceshiren.com'
 host = 'stuq.ceshiren.com:23306'
@@ -23,12 +24,18 @@ class TestCase(db.Model):
     steps = db.Column(db.String(1024), nullable=True)
 
     def __repr__(self):
+        # 方便打印
         return '<TestCase %r>' % self.name
 
 
 class TestCaseService(Resource):
     def get(self):
-        return TestCase.query.all()
+        testcase_id = request.args.get('id', None)
+        if testcase_id:
+            testcase = TestCase.query.filter_by(id=testcase_id).first()
+            return {'errcode': 1, 'body': str(testcase)}
+        else:
+            return {'errcode': 1, 'body': [str(testcase) for testcase in TestCase.query.all()]}
 
     def post(self):
         # todo: 测试用例的新增
