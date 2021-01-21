@@ -3,16 +3,32 @@
 from time import sleep
 
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
 
 class TestTestdemo():
     def setup_method(self, method):
-        self.driver = webdriver.Chrome()
+        chromeOptions = Options()
+        chromeOptions.add_argument("--headless")
+        chromeOptions.add_experimental_option(
+            "prefs",
+            {
+                "download.default_directory": "/tmp/",
+                "download.prompt_for_download": False,
+            }
+        )
+
+        print(chromeOptions.to_capabilities())
+
+        self.driver = webdriver.Chrome(
+            chrome_options=chromeOptions
+        )
         self.driver.implicitly_wait(3)
 
     def teardown_method(self, method):
-        self.driver.quit()
+        pass
+        # self.driver.quit()
 
     def test_testdemo(self):
         self.driver.get("https://ceshiren.com/")
