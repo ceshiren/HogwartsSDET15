@@ -3,6 +3,7 @@ import json
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
+from jenkinsapi.jenkins import Jenkins
 
 app = Flask(__name__)
 api = Api(app)
@@ -17,6 +18,13 @@ dbname = 'python15'
 options = 'charset=utf8mb4'
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{username}:{password}@{host}/{dbname}?{options}'
 db = SQLAlchemy(app)
+
+jenkins = Jenkins(
+    'http://stuq.ceshiren.com:8020',
+    username='seveniruby',
+    password='11c5aeeb345481059b7146fbccc179d17d'
+)
+jenkins_job=jenkins['python15_task']
 
 
 class TestCase(db.Model):
@@ -77,6 +85,7 @@ class Task(db.Model):
             'testcases': json.loads(self.testcases)
         }
 
+
 # 一个测试任务/测试计划 代表了测试用例的集合与编排顺序
 class TaskServie(Resource):
     def get(self):
@@ -88,9 +97,9 @@ class TaskServie(Resource):
             return {'errcode': 1, 'body': [task.as_dict() for task in Task.query.all()]}
 
     def post(self):
-        data=request.json.copy()
-        data['testcases']=json.dumps(data['testcases'])
-        task=Task(**data)
+        data = request.json.copy()
+        data['testcases'] = json.dumps(data['testcases'])
+        task = Task(**data)
         print(task)
         db.session.add(task)
         db.session.commit()
@@ -104,8 +113,20 @@ class TaskServie(Resource):
         pass
 
 
+class ExeutionService(Resource):
+    def get(self):
+        pass
+
+    def post(self):
+        task_id = request.json.get('task_id')
+        task=Task.query.filter_by(id=task_id).first()
+        r = jenkins_job.invoke(build_params={'task': json.dumps(task.as_dict())})
+        return {'errcode': 0, 'msg': 'ok'}
+
+
 api.add_resource(TestCaseService, '/testcase')
 api.add_resource(TaskServie, '/task')
+api.add_resource(ExeutionService, '/execution')
 
 if __name__ == '__main__':
     app.run(debug=True)
