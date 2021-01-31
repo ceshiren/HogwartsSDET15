@@ -57,3 +57,18 @@ def test_execution():
         json={'task_id': 1}
     )
     assert r.status_code == 200
+
+def test_report():
+    r=requests.post(
+        'http://127.0.0.1:5000/report',
+        json={
+            'testcase_id': 1,
+            'status': 'pass',
+            'output': '',
+        }
+    )
+    assert r.status_code == 200
+    r=requests.get(
+        'http://127.0.0.1:5000/report'
+    )
+    assert r.status_code == 200

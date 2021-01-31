@@ -1,12 +1,14 @@
 import json
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
 from jenkinsapi.jenkins import Jenkins
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)
 
 app.config['db'] = []
 
@@ -24,7 +26,7 @@ jenkins = Jenkins(
     username='seveniruby',
     password='11c5aeeb345481059b7146fbccc179d17d'
 )
-jenkins_job=jenkins['python15_task']
+jenkins_job = jenkins['python15_task']
 
 
 class TestCase(db.Model):
@@ -37,20 +39,29 @@ class TestCase(db.Model):
         # 方便打印
         return '<TestCase %r>' % self.name
 
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'steps': self.steps
+        }
+
 
 class TestCaseService(Resource):
     def get(self):
         testcase_id = request.args.get('id', None)
         if testcase_id:
             testcase = TestCase.query.filter_by(id=testcase_id).first()
-            return {'errcode': 1, 'body': str(testcase)}
+            return {'errcode': 0, 'body': testcase.as_dict()}
         else:
-            return {'errcode': 1, 'body': [str(testcase) for testcase in TestCase.query.all()]}
+            return {'errcode': 0, 'body': [testcase.as_dict() for testcase in TestCase.query.all()]}
 
     def post(self):
         # todo: 测试用例的新增
         print(request.json)
         testcase = TestCase(**request.json)
+        testcase.id=None
         print(testcase)
         db.session.add(testcase)
         db.session.commit()
@@ -59,7 +70,16 @@ class TestCaseService(Resource):
 
     def put(self):
         # todo: 测试用例更新
-        pass
+        testcase_new = TestCase(**request.json)
+        if testcase_new.id:
+            testcase = TestCase.query.filter_by(id=testcase_new.id).first()
+            testcase.name = testcase_new.name
+            testcase.description = testcase_new.description
+            testcase.steps = testcase_new.steps
+            db.session.commit()
+            return {'msg': 'ok', 'errcode': 0}
+        else:
+            return {'msg': 'error', 'errcode': 1}
 
     def delete(self):
         # 测试用例删除
@@ -119,14 +139,70 @@ class ExeutionService(Resource):
 
     def post(self):
         task_id = request.json.get('task_id')
-        task=Task.query.filter_by(id=task_id).first()
+        task = Task.query.filter_by(id=task_id).first()
         r = jenkins_job.invoke(build_params={'task': json.dumps(task.as_dict())})
         return {'errcode': 0, 'msg': 'ok'}
 
 
+class ResultService(Resource):
+    """
+    测试结果的保存
+    """
+    pass
+
+
+class Report(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.String(120), unique=False, nullable=True)
+    output = db.Column(db.String(1024), nullable=True)
+
+    testcase_id = db.Column(db.Integer, db.ForeignKey('test_case.id'))
+    testcase = db.relationship('TestCase', backref='reports', lazy=True)
+
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'status': self.status,
+            'output': self.output
+        }
+
+
+class ReportService(Resource):
+    """
+    查询测试结果生成测试报告
+    """
+
+    def get(self):
+        report_id = request.args.get('id', None)
+        if report_id:
+            report = Task.query.filter_by(id=report_id).first()
+            return {'errcode': 1, 'body': report.as_dict()}
+        else:
+            return {'errcode': 1, 'body': [report.as_dict() for report in Report.query.all()]}
+
+    def post(self):
+        """
+
+        :return:
+        """
+        # todo: 需要一层从name到id之间的转换
+        # data=request.json.copy()
+        # data['testcase_id']=TestCase.query.filter_by(name=data['testcase_name']).first().id
+        report = Report(**request.json)
+        db.session.add(report)
+        db.session.commit()
+        return {'errcode': 0, 'msg': 'ok'}
+
+class LoginService(Resource):
+    def post(self):
+        print(request.json)
+        return {'errcode': 0, 'msg': 'login success'}
+
 api.add_resource(TestCaseService, '/testcase')
 api.add_resource(TaskServie, '/task')
 api.add_resource(ExeutionService, '/execution')
+api.add_resource(ReportService, '/report')
+api.add_resource(LoginService, '/login')
 
 if __name__ == '__main__':
     app.run(debug=True)
