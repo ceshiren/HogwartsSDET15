@@ -45,11 +45,11 @@ def pytest_collection_modifyitems(
         item._nodeid = item.nodeid.encode('utf-8').decode('unicode-escape')
 
         print({"nodeid": item.nodeid, 'name': item.name})
-        r = requests.post(
-            'http://127.0.0.1:5000/testcase',
-            json={'name': item.nodeid, 'description': item.name}
-        )
-        assert r.status_code == 200
+        # r = requests.post(
+        #     'http://127.0.0.1:5000/testcase',
+        #     json={'name': item.nodeid, 'description': item.name}
+        # )
+        # assert r.status_code == 200
 
     print(type(items))
     items.reverse()

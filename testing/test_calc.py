@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
+
 import pytest
 import yaml
 
 # 解析测试数据文件
 def get_datas():
-    with open("./datas/calc.yml", encoding='utf-8') as f:
+
+    with open(f"{os.path.dirname(__file__)}/datas/calc.yml", encoding='utf-8') as f:
         datas = yaml.safe_load(f)
     add_datas = datas['add']['datas']
     add_ids = datas['add']['ids']
