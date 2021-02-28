@@ -30,7 +30,8 @@ def test_testcase_post():
 def test_task():
     r = requests.post(
         'http://127.0.0.1:5000/task',
-        json={'testcases': [32, 33, 34,35]}
+        # json={'testcases': [32, 33, 34, 35]},
+        json={'testcases': 'testing'}
     )
     assert r.status_code == 200
 
@@ -51,15 +52,17 @@ def test_jenkins():
     print(jenkins.keys())
     jenkins['python15_task'].invoke(build_params={'task': 'demo'})
 
+
 def test_execution():
-    r=requests.post(
+    r = requests.post(
         'http://127.0.0.1:5000/execution',
-        json={'task_id': 8}
+        json={'task_id': 15}
     )
     assert r.status_code == 200
 
+
 def test_report():
-    r=requests.post(
+    r = requests.post(
         'http://127.0.0.1:5000/report',
         json={
             'testcase_id': 1,
@@ -68,7 +71,7 @@ def test_report():
         }
     )
     assert r.status_code == 200
-    r=requests.get(
+    r = requests.get(
         'http://127.0.0.1:5000/report'
     )
     assert r.status_code == 200

@@ -99,19 +99,31 @@ class Task(db.Model):
         return '<Task %r>' % self.id
 
     def as_dict(self):
-        id_list=json.loads(self.testcases)
-
-        name_list=[]
-        for testcase_id in id_list:
-            testcase=TestCase.query.filter_by(id=testcase_id).first()
-            name_list.append(testcase.name)
-
+        id_list = json.loads(self.testcases)
+        app.logger.info(id_list)
+        if isinstance(id_list, list):
+            # [1,2,3,4]
+            name_list = []
+            for testcase_id in id_list:
+                app.logger.info(testcase_id)
+                testcase = TestCase.query.filter_by(id=testcase_id).first()
+                app.logger.info(testcase)
+                if testcase:
+                    name_list.append(testcase.name)
+            expr = " ".join(name_list)
+        elif isinstance(id_list, str):
+            # testing test_demo.py
+            expr = id_list
+        else:
+            # k=v & k=v
+            pass
 
         return {
             'id': self.id,
             'name': self.name,
             'testcases': json.loads(self.testcases),
-            'command':  'pytest --junitxml=junit.xml '+' '.join(name_list),
+            # 'command':  'pytest --junitxml=junit.xml '+' '.join(name_list),
+            'command': f'pytest --junitxml=junit.xml {expr}',
         }
 
 
