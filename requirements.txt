@@ -96,7 +96,6 @@ mkdocs-material-extensions==1.0.1
 mkdocstrings==0.14.0
 mkpdfs-mkdocs==1.0.1
 more-itertools==8.2.0
-mtf @ file:///Users/seveniruby/PycharmProjects/MTF/dist/mtf-0.2.12.2021.01.31_02.50.52-py3-none-any.whl
 networkx==2.5
 nltk==3.5
 numpy==1.19.4
