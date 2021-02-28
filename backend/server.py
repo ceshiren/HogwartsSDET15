@@ -61,7 +61,7 @@ class TestCaseService(Resource):
         # todo: 测试用例的新增
         print(request.json)
         testcase = TestCase(**request.json)
-        testcase.id=None
+        testcase.id = None
         print(testcase)
         db.session.add(testcase)
         db.session.commit()
@@ -99,10 +99,19 @@ class Task(db.Model):
         return '<Task %r>' % self.id
 
     def as_dict(self):
+        id_list=json.loads(self.testcases)
+
+        name_list=[]
+        for testcase_id in id_list:
+            testcase=TestCase.query.filter_by(id=testcase_id).first()
+            name_list.append(testcase.name)
+
+
         return {
             'id': self.id,
             'name': self.name,
-            'testcases': json.loads(self.testcases)
+            'testcases': json.loads(self.testcases),
+            'command':  'pytest --junitxml=junit.xml '+' '.join(name_list),
         }
 
 
@@ -112,9 +121,9 @@ class TaskServie(Resource):
         task_id = request.args.get('id', None)
         if task_id:
             task = Task.query.filter_by(id=task_id).first()
-            return {'errcode': 1, 'body': str(task)}
+            return {'errcode': 0, 'body': task.as_dict()}
         else:
-            return {'errcode': 1, 'body': [task.as_dict() for task in Task.query.all()]}
+            return {'errcode': 0, 'body': [task.as_dict() for task in Task.query.all()]}
 
     def post(self):
         data = request.json.copy()
@@ -133,14 +142,18 @@ class TaskServie(Resource):
         pass
 
 
-class ExeutionService(Resource):
+class ExecutionService(Resource):
     def get(self):
         pass
 
     def post(self):
         task_id = request.json.get('task_id')
         task = Task.query.filter_by(id=task_id).first()
-        r = jenkins_job.invoke(build_params={'task': json.dumps(task.as_dict())})
+        r = jenkins_job.invoke(build_params={
+            'task': json.dumps(task.as_dict()),
+            'task_id': task.id,
+            'command': task.as_dict()['command']
+        })
         return {'errcode': 0, 'msg': 'ok'}
 
 
@@ -193,14 +206,16 @@ class ReportService(Resource):
         db.session.commit()
         return {'errcode': 0, 'msg': 'ok'}
 
+
 class LoginService(Resource):
     def post(self):
         print(request.json)
         return {'errcode': 0, 'msg': 'login success'}
 
+
 api.add_resource(TestCaseService, '/testcase')
 api.add_resource(TaskServie, '/task')
-api.add_resource(ExeutionService, '/execution')
+api.add_resource(ExecutionService, '/execution')
 api.add_resource(ReportService, '/report')
 api.add_resource(LoginService, '/login')
 

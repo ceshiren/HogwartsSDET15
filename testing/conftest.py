@@ -3,6 +3,7 @@
 from typing import List
 
 import pytest
+import requests
 import yaml
 
 from pythoncode.calculator import Calculator
@@ -37,6 +38,19 @@ def get_calc():
 def pytest_collection_modifyitems(
         session: "Session", config: "Config", items: List["Item"]
 ) -> None:
+    for item in items:
+        #todo：判重
+
+        item.name = item.name.encode('utf-8').decode('unicode-escape')
+        item._nodeid = item.nodeid.encode('utf-8').decode('unicode-escape')
+
+        print({"nodeid": item.nodeid, 'name': item.name})
+        r = requests.post(
+            'http://127.0.0.1:5000/testcase',
+            json={'name': item.nodeid, 'description': item.name}
+        )
+        assert r.status_code == 200
+
     print(type(items))
     items.reverse()
 
